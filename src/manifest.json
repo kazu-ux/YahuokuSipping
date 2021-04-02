@@ -3,13 +3,13 @@
     "version": "1.0.0",
     "manifest_version": 2,
     "description": "ヤフオクオークションページに送料込みの価格を表示する",
-    "content_script": [
+    "content_scripts": [
         {
             "matches": [
                 "https://page.auctions.yahoo.co.jp/jp/auction/*"
             ],
             "js": [
-                "content_script"
+                "content_script.js"
             ]
         }
     ]
