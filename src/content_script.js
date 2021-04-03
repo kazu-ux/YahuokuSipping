@@ -66,4 +66,4 @@ const main = () => {
 }
 
 //HTMLの読み込みが完了してから
-document.addEventListener('DOMContentLoaded', main());
+document.addEventListener('load', main());
