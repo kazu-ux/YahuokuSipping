@@ -10,7 +10,7 @@ const addShipping = () => {
 
 //送料を入力するフォームを作る
 const createShippingForm = () => {
-    document.querySelector('#SumShipping').insertAdjacentHTML('afterend', '<input type="number" name="shipping" value="660">円')
+    document.querySelector('#SumShipping').insertAdjacentHTML('afterend', `<input type="number" name="shipping" value="${returnShipping()}">円`)
     const shippingForm = document.querySelector("dl > input[type=number]");
     getInputValue();
     shippingForm.addEventListener('input', () => {
@@ -36,6 +36,16 @@ const getInputValue = () => {
     const shippingForm = document.querySelector("dl > input[type=number]");
     const shippingPlusPrice = Number(shippingForm.value) + Number(returnPrice());
     SumShippingArea.textContent = String(shippingPlusPrice) + "円";
+}
+
+//出品者が設定している送料を取得する
+const returnShipping = () => {
+    try {
+        const shipping = document.querySelector(".Price__postageValue").children[1].textContent
+        return shipping
+    } catch (error) {
+        return "0"
+    }
 }
 
 const main = () => {
