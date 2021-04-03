@@ -41,7 +41,7 @@ const getInputValue = () => {
 //出品者が設定している送料を取得する
 const returnShipping = () => {
     try {
-        const shipping = document.querySelector(".Price__postageValue").children[1].textContent
+        const shipping = document.querySelector(".Price__postageValue").children[1].textContent.replace(/,/g, '');
         return shipping
     } catch (error) {
         return "0"
