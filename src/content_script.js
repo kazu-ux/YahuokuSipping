@@ -48,9 +48,20 @@ const returnShipping = () => {
     }
 }
 
+//LocalStorageに入力した送料を保存する
+const shippingToLocalStorage = (num) => {
+    localStorage.setItem('shipping', num);
+    //localStorage.setItem('bar', 2);
+
+    //console.log(localStorage.length);
+
+    //console.log(localStorage.getItem('foo'));
+}
+
 const main = () => {
     addShipping();
     createShippingForm();
+    //shippingToLocalStorage();
 }
 
 //HTMLの読み込みが完了してから
