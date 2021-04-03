@@ -34,6 +34,7 @@ const returnPrice = () => {
 const getInputValue = () => {
     const SumShippingArea = document.querySelector('#SumShipping');
     const shippingForm = document.querySelector("dl > input[type=number]");
+    shippingToLocalStorage(Number(shippingForm.value));
     const shippingPlusPrice = Number(shippingForm.value) + Number(returnPrice());
     SumShippingArea.textContent = String(shippingPlusPrice) + "円";
 }
