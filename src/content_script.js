@@ -15,13 +15,15 @@ const setShipping = async () => {
     console.log(shippingValue);
     const shippingForm = document.querySelector("dl > input[type=number]");
     shippingForm.setAttribute('value', shippingValue)
+    sumShippingAndPrice();
 }
 
 //入力されている送料を現在価格と足し合わせる
 const sumShippingAndPrice = () => {
-    //getInputValue();
+    getInputValue();
+    const shippingForm = document.querySelector("dl > input[type=number]");
     shippingForm.addEventListener('input', () => {
-        //getInputValue();
+        getInputValue();
     })
 }
 
@@ -41,7 +43,7 @@ const returnPrice = () => {
 const getInputValue = () => {
     const SumShippingArea = document.querySelector('#SumShipping');
     const shippingForm = document.querySelector("dl > input[type=number]");
-    shippingToLocalStorage(Number(shippingForm.value));
+    setShippingToLocalStorage(Number(shippingForm.value));
     const shippingPlusPrice = Number(shippingForm.value) + Number(returnPrice());
     SumShippingArea.textContent = String(shippingPlusPrice) + "円";
 }
@@ -59,8 +61,8 @@ const tryReturnShipping = new Promise((resolve, reject) => {
 });
 
 //LocalStorageに入力した送料を保存する
-const shippingToLocalStorage = (num) => {
-    localStorage.setItem('shipping', num);
+const setShippingToLocalStorage = (num) => {
+    localStorage.setItem(getAuctionId() + "_Shipping", num);
     //localStorage.setItem('bar', 2);
 
     //console.log(localStorage.length);
@@ -68,11 +70,16 @@ const shippingToLocalStorage = (num) => {
     //console.log(localStorage.getItem('foo'));
 }
 
+//アクセスしているオークションIDを取得する
+const getAuctionId = () => {
+    const auctionId = document.querySelectorAll("dd.ProductDetail__description")[10].textContent.replace(/：/g, "");
+    console.log(auctionId);
+    return auctionId
+}
+
 const main = () => {
     insertShippingForm();
     setShipping();
-    //shippingToLocalStorage();
-    //returnShipping();
 }
 
 //HTMLの読み込みが完了してから
