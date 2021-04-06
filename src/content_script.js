@@ -58,26 +58,6 @@ const tryReturnShipping = new Promise((resolve, reject) => {
     }, 2000);
 });
 
-//MutationObserverを使って、送料が表示されたら送料をリターンする
-const returnShippingMO = async () => {
-    const shippingEle = document.getElementsByClassName("Price__postageValue")[0];
-    const observer = new MutationObserver((mutations) => {
-
-        mutations.forEach((mutation) => {
-            console.log(mutation.target.childNodes[2].textContent.replace(/,/g, '') + "MO");
-            return (mutation.target.childNodes[2].textContent.replace(/,/g, ''));
-        });
-    });
-
-    const config = { attributes: true, childList: true, characterData: true };
-
-    observer.observe(shippingEle, config);
-
-    setTimeout(() => {
-        observer.disconnect();
-    }, 10000);
-};
-
 //LocalStorageに入力した送料を保存する
 const shippingToLocalStorage = (num) => {
     localStorage.setItem('shipping', num);
