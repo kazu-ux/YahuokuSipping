@@ -1,20 +1,27 @@
 
-//送料込み価格の項目と送料入力ボックスを追加する
-const addShipping = () => {
+//送料込み価格と送料入力フォームの項目を追加する
+const insertShippingForm = () => {
     document
         .querySelector(".Price__value")
         .insertAdjacentHTML("afterend",
             '<dt class="Price__title">送料・税込み価格</dt>' +
-            '<dd class="Price__value" id="SumShipping">----円</dd>')
+            '<dd class="Price__value" id="SumShipping">----円</dd>' +
+            '<input type="number" name="shippingInput" value="">円')
 }
 
-//送料を入力するフォームを作る
-const createShippingForm = () => {
-    document.querySelector('#SumShipping').insertAdjacentHTML('afterend', `<input type="number" name="shipping" value="${returnShipping()}">円`)
+//出品者が設定している送料を入力する
+const setShipping = async () => {
+    const shippingValue = await tryReturnShipping;
+    console.log(shippingValue);
     const shippingForm = document.querySelector("dl > input[type=number]");
-    getInputValue();
+    shippingForm.setAttribute('value', shippingValue)
+}
+
+//入力されている送料を現在価格と足し合わせる
+const sumShippingAndPrice = () => {
+    //getInputValue();
     shippingForm.addEventListener('input', () => {
-        getInputValue();
+        //getInputValue();
     })
 }
 
@@ -40,14 +47,36 @@ const getInputValue = () => {
 }
 
 //出品者が設定している送料を取得する
-const returnShipping = () => {
-    try {
-        const shipping = document.querySelector(".Price__postageValue").children[1].textContent.replace(/,/g, '');
-        return shipping
-    } catch (error) {
-        return "0"
-    }
-}
+const tryReturnShipping = new Promise((resolve, reject) => {
+    setTimeout(() => {
+        try {
+            const shipping = document.querySelector('.Price__postageValue').children[1].textContent.replace(/,/g, '');
+            resolve(shipping)
+        } catch (error) {
+            resolve('0')
+        }
+    }, 2000);
+});
+
+//MutationObserverを使って、送料が表示されたら送料をリターンする
+const returnShippingMO = async () => {
+    const shippingEle = document.getElementsByClassName("Price__postageValue")[0];
+    const observer = new MutationObserver((mutations) => {
+
+        mutations.forEach((mutation) => {
+            console.log(mutation.target.childNodes[2].textContent.replace(/,/g, '') + "MO");
+            return (mutation.target.childNodes[2].textContent.replace(/,/g, ''));
+        });
+    });
+
+    const config = { attributes: true, childList: true, characterData: true };
+
+    observer.observe(shippingEle, config);
+
+    setTimeout(() => {
+        observer.disconnect();
+    }, 10000);
+};
 
 //LocalStorageに入力した送料を保存する
 const shippingToLocalStorage = (num) => {
@@ -60,10 +89,12 @@ const shippingToLocalStorage = (num) => {
 }
 
 const main = () => {
-    addShipping();
-    createShippingForm();
+    insertShippingForm();
+    setShipping();
     //shippingToLocalStorage();
+    //returnShipping();
 }
 
 //HTMLの読み込みが完了してから
-document.addEventListener('load', main());
+//window.onload = main();
+window.addEventListener('DOMContentLoaded', main());
