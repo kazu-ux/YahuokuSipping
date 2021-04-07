@@ -12,5 +12,14 @@
                 "content_script.js"
             ]
         }
-    ]
+    ],
+    "prmissions": [
+        "coocikes"
+    ],
+    "background": {
+        "scripts": [
+            "background.js"
+        ],
+        "persistent": true
+    }
 }
