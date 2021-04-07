@@ -18,6 +18,18 @@ const setShipping = async () => {
     sumShippingAndPrice();
 }
 
+//出品者が設定している送料を取得する
+const tryReturnShipping = new Promise((resolve, reject) => {
+    setTimeout(() => {
+        try {
+            const shipping = document.querySelector('.Price__postageValue--bold').textContent.replace(/,/g, '');
+            resolve(shipping)
+        } catch (error) {
+            resolve('')
+        }
+    }, 2000);
+});
+
 //入力されている送料を現在価格と足し合わせる
 const sumShippingAndPrice = () => {
     getInputValue();
@@ -48,17 +60,7 @@ const getInputValue = () => {
     SumShippingArea.textContent = String(shippingPlusPrice) + "円";
 }
 
-//出品者が設定している送料を取得する
-const tryReturnShipping = new Promise((resolve, reject) => {
-    setTimeout(() => {
-        try {
-            const shipping = document.querySelector('.Price__postageValue--bold').textContent.replace(/,/g, '');
-            resolve(shipping)
-        } catch (error) {
-            resolve('')
-        }
-    }, 2000);
-});
+
 
 //LocalStorageに入力した送料を保存する
 const setShippingToLocalStorage = (strShip) => {
