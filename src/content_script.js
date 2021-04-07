@@ -53,8 +53,11 @@ const returnPrice = () => {
 
 //入力ボックスの値を取得する
 const getInputValue = () => {
+    //合計金額を表示する場所
     const SumShippingArea = document.querySelector('#SumShipping');
+    //送料を入力するボックスの場所
     const shippingForm = document.querySelector("dl > input[type=number]");
+    console.log(getUnixTime());
     //setShippingToLocalStorage(shippingForm.value);
     const shippingPlusPrice = Number(shippingForm.value) + Number(returnPrice());
     SumShippingArea.textContent = String(shippingPlusPrice) + "円";
@@ -77,6 +80,13 @@ const getAuctionId = () => {
     const auctionId = document.querySelectorAll("dd.ProductDetail__description")[10].textContent.replace(/：/g, "");
     console.log(auctionId);
     return auctionId
+}
+
+//LocalStorageに保存した時間をUNIX時間で取得する
+const getUnixTime = () => {
+    const date = new Date();
+    const unixTime = Math.floor(date.getTime() / 1000);
+    return unixTime
 }
 
 //LocalStorageにアクセスして、送料が保存されているかを確認する
