@@ -6,11 +6,16 @@ const getUnixTime = () => {
 
 const getTabId = () => new Promise((resolve, reject) => {
     chrome.tabs.query({ active: true, currentWindow: true }, (tab) => {
-        console.log(tab)
+        //console.log(tab)
         const tabId = tab[0].id
         resolve(tabId);
     })
 })
+
+
+const setCookies = (details) => {
+    chrome.cookies.set(details);
+}
 
 chrome.runtime.onMessage.addListener((details) => {
     const cookieDetailsSet = {
@@ -24,22 +29,18 @@ chrome.runtime.onMessage.addListener((details) => {
         name: details.name,
         url: details.url
     }
-    chrome.cookies.set(details)
-    //chrome.cookies.set(cookieDetailsSet)
-    /*
+
     chrome.cookies.get(detailsForGet, async (res) => {
-        if (res) {
+        if (res && details.isFirst) {
             const tabId = await getTabId();
             const shippingValue = res.value;
             chrome.tabs.sendMessage(Number(tabId), shippingValue);
             console.log(res);
-        } else {
+        } else if (!details.isFirst) {
             console.log(details);
-            
+            setCookies(details);
         }
-
     })
-    */
-    return true
 
+    return true
 })
