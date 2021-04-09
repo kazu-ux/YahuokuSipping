@@ -6,7 +6,7 @@
     "content_scripts": [
         {
             "matches": [
-                "https://page.auctions.yahoo.co.jp/jp/auction/*"
+                "https://page.auctions.yahoo.co.jp/*"
             ],
             "js": [
                 "content_script.js"
@@ -14,7 +14,9 @@
         }
     ],
     "permissions": [
-        "cookies"
+        "tabs",
+        "cookies",
+        "https://page.auctions.yahoo.co.jp/*"
     ],
     "background": {
         "scripts": [
