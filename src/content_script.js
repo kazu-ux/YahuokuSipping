@@ -50,11 +50,22 @@ const getShipping = async () => {
 //出品者が設定している送料を取得する
 const tryReturnShipping = new Promise((resolve, reject) => {
     setTimeout(() => {
-        try {
-            const shipping = document.querySelector('.Price__postageValue--bold').textContent.replace(/,/g, '');
-            resolve(shipping)
-        } catch (error) {
-            resolve('')
+        const shippingEle = document.querySelector('.Price__postageValue');
+        //送料無料の場合
+        if (shippingEle.textContent === "無料") {
+            resolve("0");
+        }
+        //全国一律の場合
+        else if (shippingEle.textContent.match(/全国一律/)) {
+            resolve(document.querySelector(".Price__postageValue > .Price__postageValue").textContent.replace(/,/g, ""));
+        }
+        //地域ごとの送料が設定されている場合
+        else if (shippingEle.textContent.match(/[は円]/)) {
+            resolve(document.querySelector(".Price__postageValue > .Price__postageValue").textContent.replace(/,/g, ""));
+        }
+        //送料未設定の場合
+        else {
+            resolve("");
         }
     }, 2000);
 });
