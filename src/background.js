@@ -18,7 +18,7 @@ chrome.runtime.onMessage.addListener((details) => {
     }
 
     chrome.cookies.get(detailsForGet, async (res) => {
-        const tabId = await getTabId();
+        const tabId = await getTabId(details.auctionUrl);
         if (res) {
             const shippingValue = res.value;
             chrome.tabs.sendMessage(Number(tabId), { shipping: shippingValue, isCookie: true });
