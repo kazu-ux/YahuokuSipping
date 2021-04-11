@@ -1,9 +1,3 @@
-const getUnixTime = () => {
-    const date = new Date();
-    const unixTime = Math.floor(date.getTime() / 1000);
-    return unixTime
-}
-
 const getTabId = () => new Promise((resolve, reject) => {
     chrome.tabs.query({ active: true, currentWindow: true }, (tab) => {
         //console.log(tab)
