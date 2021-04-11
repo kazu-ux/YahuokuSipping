@@ -27,8 +27,10 @@ const monitorShippingInput = () => {
     const input = document.querySelector("dl > input[type=number]");
     const observer = new MutationObserver((mutations) => {
         mutations.forEach((mutation) => {
-            setShippingToCookies(mutation.target.value);
-            console.log(mutation.target.value)
+            const savedShipping = mutation.target.value
+            setShippingToCookies(savedShipping);
+            sumShippingAndPrice(savedShipping);
+            //console.log(mutation.target.value)
             observer.disconnect();
         })
     })
@@ -36,7 +38,9 @@ const monitorShippingInput = () => {
 
     observer.observe(input, config);
 
-    input.addEventListener("input", () => { getInputValue() });
+    input.addEventListener("input", () => {
+        sumShippingAndPrice(getInputValue());
+    });
 }
 
 //出品者が設定している送料を取得する
@@ -70,13 +74,14 @@ const tryReturnShipping = new Promise((resolve, reject) => {
     }, 2000);
 });
 
-//入力されている送料を現在価格と足し合わせる
-const sumShippingAndPrice = async () => {
-    //getInputValue();
-    const shippingForm = document.querySelector("dl > input[type=number]");
-    shippingForm.addEventListener('input', () => {
-        getInputValue();
-    })
+//入力されている送料を現在価格と足し合わせて、表示する
+const sumShippingAndPrice = async (inputedShinnping) => {
+    //合計金額を表示する場所
+    const SumShippingArea = document.querySelector('#SumShipping');
+    //現在価格と送料を足す
+    const shippingPlusPrice = Number(inputedShinnping) + Number(returnPrice());
+    //送料込み価格を表示する
+    SumShippingArea.textContent = String(shippingPlusPrice) + "円";
 }
 
 //現在価格、または税込み価格を返す関数
@@ -100,6 +105,7 @@ const getInputValue = () => {
     const inputedShinnping = shippingForm.value;
     console.log(inputedShinnping);
     setShippingToCookies(inputedShinnping);
+    return inputedShinnping
     //const shippingPlusPrice = Number(inputedShinnping) + Number(returnPrice());
     //SumShippingArea.textContent = String(shippingPlusPrice) + "円";
 }
