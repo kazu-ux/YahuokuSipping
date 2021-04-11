@@ -1,5 +1,5 @@
-const getTabId = () => new Promise((resolve, reject) => {
-    chrome.tabs.query({ active: true, currentWindow: true }, (tab) => {
+const getTabId = (url) => new Promise((resolve, reject) => {
+    chrome.tabs.query({ url: url }, (tab) => {
         //console.log(tab)
         const tabId = tab[0].id
         resolve(tabId);
