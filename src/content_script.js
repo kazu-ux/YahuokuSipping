@@ -12,8 +12,8 @@ const insertShippingForm = async () => {
 //Cookieに送料が保存されているかを確認する
 const tryGetShippingCookie = async () => {
     const name = getAuctionId() + "_shipping"
-    const shipping = await getShipping();
-    chrome.runtime.sendMessage(message = { name: name, url: "https://page.auctions.yahoo.co.jp/" });
+    //const shipping = await getShipping();
+    chrome.runtime.sendMessage(message = { name: name, url: "https://page.auctions.yahoo.co.jp/", auctionUrl: getAuctionUrl() });
 }
 
 //送料入力欄に数値を入れる
@@ -115,6 +115,11 @@ const getAuctionId = () => {
     const auctionId = document.querySelectorAll("dd.ProductDetail__description")[10].textContent.replace(/：/g, "");
     //console.log(auctionId);
     return auctionId
+}
+
+const getAuctionUrl = () => {
+    const auctionUrl = location.href;
+    return auctionUrl
 }
 
 //現在時刻をUnixtimeで返す
