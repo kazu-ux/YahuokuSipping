@@ -18,29 +18,28 @@ const setCookies = (details) => {
 }
 
 chrome.runtime.onMessage.addListener((details) => {
-    const cookieDetailsSet = {
-        name: "test",
-        value: "100",
-        url: "https://page.auctions.yahoo.co.jp/",
-        expirationDate: getUnixTime() + 300
-    }
-
     const detailsForGet = {
         name: details.name,
         url: details.url
     }
 
     chrome.cookies.get(detailsForGet, async (res) => {
-        if (res && details.isFirst) {
-            const tabId = await getTabId();
+        const tabId = await getTabId();
+        if (res) {
             const shippingValue = res.value;
-            chrome.tabs.sendMessage(Number(tabId), shippingValue);
+            chrome.tabs.sendMessage(Number(tabId), { shipping: shippingValue, isCookie: true });
             console.log(res);
-        } else if (!details.isFirst) {
             console.log(details);
-            setCookies(details);
+        } else {
+            chrome.tabs.sendMessage(Number(tabId), { isCookie: false })
+            //setCookies(details);
         }
     })
+
+    if (details.value) {
+        setCookies(details);
+
+    }
 
     return true
 })
