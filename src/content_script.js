@@ -132,7 +132,7 @@ const getUnixTime = () => {
 //Cookieに入力している送料を保存する
 const setShippingToCookies = async (shipping) => {
     const name = getAuctionId() + "_shipping"
-    chrome.runtime.sendMessage({ name: name, url: "https://page.auctions.yahoo.co.jp/", value: shipping, expirationDate: getUnixTime() + 600 });
+    chrome.runtime.sendMessage({ name: name, url: "https://page.auctions.yahoo.co.jp/", value: shipping, expirationDate: getUnixTime() + 259200 });
 }
 
 //Cookieに送料が保存されていれば、その送料を入力ボックスに挿入する。
