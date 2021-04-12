@@ -30,7 +30,6 @@ const monitorShippingInput = () => {
             const savedShipping = mutation.target.value
             setShippingToCookies(savedShipping);
             sumShippingAndPrice(savedShipping);
-            //console.log(mutation.target.value)
             observer.disconnect();
         })
     })
@@ -47,8 +46,6 @@ const monitorShippingInput = () => {
 const getShipping = async () => {
     const shippingValue = await tryReturnShipping;
     return shippingValue
-    //setShippingToInputBox(shippingValue);
-    //sumShippingAndPrice();
 }
 
 //出品者が設定している送料を取得する
@@ -103,17 +100,13 @@ const getInputValue = () => {
     //送料を入力するボックスの場所
     const shippingForm = document.querySelector("dl > input[type=number]");
     const inputedShinnping = shippingForm.value;
-    console.log(inputedShinnping);
     setShippingToCookies(inputedShinnping);
     return inputedShinnping
-    //const shippingPlusPrice = Number(inputedShinnping) + Number(returnPrice());
-    //SumShippingArea.textContent = String(shippingPlusPrice) + "円";
 }
 
 //アクセスしているオークションIDを取得する
 const getAuctionId = () => {
     const auctionId = document.querySelectorAll("dd.ProductDetail__description")[10].textContent.replace(/：/g, "");
-    //console.log(auctionId);
     return auctionId
 }
 
@@ -157,5 +150,4 @@ const main = async () => {
 }
 
 //HTMLの読み込みが完了してから
-//window.onload = main();
 window.addEventListener('DOMContentLoaded', main());

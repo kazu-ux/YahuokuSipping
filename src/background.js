@@ -1,6 +1,5 @@
 const getTabId = (url) => new Promise((resolve, reject) => {
     chrome.tabs.query({ url: url }, (tab) => {
-        //console.log(tab)
         const tabId = tab[0].id
         resolve(tabId);
     })
@@ -22,18 +21,13 @@ chrome.runtime.onMessage.addListener((details) => {
         if (res) {
             const shippingValue = res.value;
             chrome.tabs.sendMessage(Number(tabId), { shipping: shippingValue, isCookie: true });
-            console.log(res);
-            console.log(details);
         } else {
             chrome.tabs.sendMessage(Number(tabId), { isCookie: false })
-            //setCookies(details);
         }
     })
 
     if (details.value) {
         setCookies(details);
-
     }
-
     return true
 })
