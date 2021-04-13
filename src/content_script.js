@@ -12,7 +12,6 @@ const insertShippingForm = async () => {
 //Cookieに送料が保存されているかを確認する
 const tryGetShippingCookie = async () => {
     const name = getAuctionId() + "_shipping"
-    //const shipping = await getShipping();
     chrome.runtime.sendMessage(message = { name: name, url: "https://page.auctions.yahoo.co.jp/", auctionUrl: getAuctionUrl() });
 }
 
@@ -23,7 +22,7 @@ const setShippingToInputBox = (num) => {
 }
 
 //送料入力ボックスを監視する
-const monitorShippingInput = () => {
+const monitorShippingInput = async () => {
     const input = document.querySelector("dl > input[type=number]");
     const observer = new MutationObserver((mutations) => {
         mutations.forEach((mutation) => {
@@ -77,8 +76,10 @@ const sumShippingAndPrice = async (inputedShinnping) => {
     const SumShippingArea = document.querySelector('#SumShipping');
     //現在価格と送料を足す
     const shippingPlusPrice = Number(inputedShinnping) + Number(returnPrice());
+    //金額にカンマを入れる
+    const priceInToComma = shippingPlusPrice.toLocaleString();
     //送料込み価格を表示する
-    SumShippingArea.textContent = String(shippingPlusPrice) + "円";
+    SumShippingArea.textContent = String(priceInToComma) + "円";
 }
 
 //現在価格、または税込み価格を返す関数
@@ -142,11 +143,8 @@ chrome.runtime.onMessage.addListener(async (message) => {
 
 const main = async () => {
     await insertShippingForm();
-    monitorShippingInput();
+    await monitorShippingInput();
     await tryGetShippingCookie();
-    //await getShipping();
-    //await sumShippingAndPrice()
-    //setCookie();
 }
 
 //HTMLの読み込みが完了してから
