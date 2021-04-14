@@ -2,7 +2,7 @@
     "name": "ヤフオク送料込み価格表示",
     "version": "1.0.0",
     "manifest_version": 2,
-    "description": "ヤフオクオークションページに送料込みの価格を表示する",
+    "description": "ヤフオクオークションページに送料込みの価格を表示します。",
     "content_scripts": [
         {
             "matches": [
