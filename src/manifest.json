@@ -3,6 +3,9 @@
     "version": "1.0.0",
     "manifest_version": 2,
     "description": "ヤフオクオークションページに送料込みの価格を表示します。",
+    "icons": {
+        "128": "icons/128.png"
+    },
     "content_scripts": [
         {
             "matches": [
