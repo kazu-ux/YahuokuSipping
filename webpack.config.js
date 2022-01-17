@@ -11,7 +11,6 @@ module.exports = {
   entry: {
     background: path.join(__dirname, 'src/background.ts'),
     content_script: path.join(__dirname, 'src/content_script.ts'),
-    'options/options': path.join(__dirname, 'src/options/options.ts'),
   },
 
   output: {

@@ -1,33 +1,36 @@
-const getTabId = (url) => new Promise((resolve, reject) => {
+const getTabId = (url: string) =>
+  new Promise((resolve, reject) => {
     chrome.tabs.query({ url: url }, (tab) => {
-        const tabId = tab[0].id
-        resolve(tabId);
-    })
-})
+      const tabId = tab[0].id;
+      resolve(tabId);
+    });
+  });
 
-
-const setCookies = (details) => {
-    chrome.cookies.set(details);
-}
+const setCookies = (details: any) => {
+  chrome.cookies.set(details);
+};
 
 chrome.runtime.onMessage.addListener((details) => {
-    const detailsForGet = {
-        name: details.name,
-        url: details.url
-    }
+  const detailsForGet = {
+    name: details.name,
+    url: details.url,
+  };
 
-    chrome.cookies.get(detailsForGet, async (res) => {
-        const tabId = await getTabId(details.auctionUrl);
-        if (res) {
-            const shippingValue = res.value;
-            chrome.tabs.sendMessage(Number(tabId), { shipping: shippingValue, isCookie: true });
-        } else {
-            chrome.tabs.sendMessage(Number(tabId), { isCookie: false })
-        }
-    })
-
-    if (details.value) {
-        setCookies(details);
+  chrome.cookies.get(detailsForGet, async (res) => {
+    const tabId = await getTabId(details.auctionUrl);
+    if (res) {
+      const shippingValue = res.value;
+      chrome.tabs.sendMessage(Number(tabId), {
+        shipping: shippingValue,
+        isCookie: true,
+      });
+    } else {
+      chrome.tabs.sendMessage(Number(tabId), { isCookie: false });
     }
-    return true
-})
+  });
+
+  if (details.value) {
+    setCookies(details);
+  }
+  return true;
+});
