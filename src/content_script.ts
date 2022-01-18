@@ -5,46 +5,72 @@
       .querySelector('.Price__value')!
       .insertAdjacentHTML(
         'afterend',
-        '<dt class="Price__title">送料・税込み価格</dt>' +
-          '<dd class="Price__value" id="SumShipping">----円</dd>' +
-          '<input type="number" name="shippingInput" value="">円'
+        '<dt class="Price__title ys">送料・税込み価格</dt>' +
+          '<dd class="Price__value ys" id="SumShipping">----円</dd>' +
+          '<input type="number" id="shippingInput" value="">円'
       );
+  };
+
+  const Price = (shipping: number) => {
+    const getCurrentPrice = () => {
+      const targetElement = document.querySelector('.Price__value')!;
+      return Number(
+        targetElement.childNodes[0].textContent!.replace(/[^0-9]/g, '')
+      );
+    };
+    const getTax = () => {
+      const targetElement = document.querySelector('.Price__value')!;
+      return Number(
+        targetElement.childNodes[1].textContent!.replace(/[^0-9]/g, '')
+      );
+    };
+
+    const currentPrice = getCurrentPrice();
+    const tax = getTax();
+    const totalPrice = currentPrice + tax + shipping;
+
+    console.log(currentPrice, shipping, totalPrice);
+    return {
+      sumPrice: () => {
+        return totalPrice;
+      },
+      setTotalPrice: () => {
+        document.querySelector('#SumShipping')!.textContent =
+          String(totalPrice) + '円';
+      },
+      setShipping: () => {
+        (document.querySelector('#shippingInput') as HTMLInputElement).value =
+          String(shipping);
+      },
+    };
   };
 
   //Cookieに送料が保存されているかを確認する
   const tryGetShippingCookie = async () => {
     const name = getAuctionId() + '_shipping';
-    chrome.runtime.sendMessage({
-      name: name,
-      url: 'https://page.auctions.yahoo.co.jp/',
-      auctionUrl: getAuctionUrl(),
-    });
+    const auctioURL = getAuctionUrl();
+
+    chrome.runtime.sendMessage(
+      {
+        name: name,
+        url: 'https://page.auctions.yahoo.co.jp/',
+      },
+      (shipping: number | undefined | null) => {
+        const bar = Price(Number(shipping));
+
+        console.log(bar.sumPrice());
+        //
+        bar.setShipping();
+        bar.setTotalPrice();
+        console.log(shipping);
+      }
+    );
   };
 
   //送料入力欄に数値を入れる
   const setShippingToInputBox = (num: number) => {
     const shippingForm = document.querySelector('dl > input[type=number]')!;
     shippingForm.setAttribute('value', String(num));
-  };
-
-  //送料入力ボックスを監視する
-  const monitorShippingInput = async () => {
-    const input = document.querySelector('dl > input[type=number]')!;
-    const observer = new MutationObserver((mutations) => {
-      mutations.forEach((mutation) => {
-        const savedShipping = (mutation.target as any).value;
-        setShippingToCookies(savedShipping);
-        sumShippingAndPrice(savedShipping);
-        observer.disconnect();
-      });
-    });
-    const config = { attributes: true, characterData: true };
-
-    observer.observe(input, config);
-
-    input.addEventListener('input', () => {
-      sumShippingAndPrice(getInputValue());
-    });
   };
 
   //出品者が設定している送料を取得する
@@ -112,22 +138,9 @@
     }
   };
 
-  //入力ボックスの値を取得して、合計金額を表示する
-  const getInputValue = () => {
-    //合計金額を表示する場所
-    const SumShippingArea = document.querySelector('#SumShipping');
-    //送料を入力するボックスの場所
-    const shippingForm = document.querySelector('dl > input[type=number]');
-    const inputedShinnping = (shippingForm! as any).value;
-    setShippingToCookies(inputedShinnping);
-    return inputedShinnping;
-  };
-
   //アクセスしているオークションIDを取得する
   const getAuctionId = () => {
-    const auctionId = document
-      .querySelectorAll('dd.ProductDetail__description')![10]
-      .textContent!.replace(/:/g, '');
+    const auctionId = location.href.split('/')[5];
     return auctionId;
   };
 
@@ -168,9 +181,19 @@
 
   const main = async () => {
     console.log('test');
+
+    // 送料入力フォームを追加する
     await insertShippingForm();
-    await monitorShippingInput();
     await tryGetShippingCookie();
+
+    document
+      .querySelector('#shippingInput')!
+      .addEventListener('input', (event) => {
+        const inputELement = event.composedPath()[0] as HTMLInputElement;
+        const inputvalue = inputELement.value;
+
+        Price(Number(inputvalue)).setTotalPrice();
+      });
   };
 
   //HTMLの読み込みが完了してから

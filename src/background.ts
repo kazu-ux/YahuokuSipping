@@ -7,30 +7,21 @@ const getTabId = (url: string) =>
   });
 
 const setCookies = (details: any) => {
-  chrome.cookies.set(details);
+  chrome.cookies.set(details).then((res) => {
+    // console.log(res);
+  });
 };
 
-chrome.runtime.onMessage.addListener((details) => {
-  const detailsForGet = {
-    name: details.name,
-    url: details.url,
-  };
+chrome.runtime.onMessage.addListener(
+  (details: { name: string; url: string; value?: string }, _, sendResponse) => {
+    chrome.cookies.get(details).then((cookies) => {
+      console.log(cookies);
+      if (!cookies) {
+        setCookies(details);
+      }
+      sendResponse(cookies?.value);
+    });
 
-  chrome.cookies.get(detailsForGet, async (res) => {
-    const tabId = await getTabId(details.auctionUrl);
-    if (res) {
-      const shippingValue = res.value;
-      chrome.tabs.sendMessage(Number(tabId), {
-        shipping: shippingValue,
-        isCookie: true,
-      });
-    } else {
-      chrome.tabs.sendMessage(Number(tabId), { isCookie: false });
-    }
-  });
-
-  if (details.value) {
-    setCookies(details);
+    return true;
   }
-  return true;
-});
+);

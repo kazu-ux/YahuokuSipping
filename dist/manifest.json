@@ -9,7 +9,8 @@
   "content_scripts": [
     {
       "matches": ["https://page.auctions.yahoo.co.jp/*"],
-      "js": ["content_script.js"]
+      "js": ["content_script.js"],
+      "css": ["style.css"]
     }
   ],
   "permissions": ["tabs", "cookies"],

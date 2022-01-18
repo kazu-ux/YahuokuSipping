@@ -12,29 +12,18 @@ const getTabId = (url) => new Promise((resolve, reject) => {
     });
 });
 const setCookies = (details) => {
-    chrome.cookies.set(details);
-};
-chrome.runtime.onMessage.addListener((details) => {
-    const detailsForGet = {
-        name: details.name,
-        url: details.url,
-    };
-    chrome.cookies.get(detailsForGet, async (res) => {
-        const tabId = await getTabId(details.auctionUrl);
-        if (res) {
-            const shippingValue = res.value;
-            chrome.tabs.sendMessage(Number(tabId), {
-                shipping: shippingValue,
-                isCookie: true,
-            });
-        }
-        else {
-            chrome.tabs.sendMessage(Number(tabId), { isCookie: false });
-        }
+    chrome.cookies.set(details).then((res) => {
+        // console.log(res);
     });
-    if (details.value) {
-        setCookies(details);
-    }
+};
+chrome.runtime.onMessage.addListener((details, _, sendResponse) => {
+    chrome.cookies.get(details).then((cookies) => {
+        console.log(cookies);
+        if (!cookies) {
+            setCookies(details);
+        }
+        sendResponse(cookies?.value);
+    });
     return true;
 });
 
