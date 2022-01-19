@@ -37,7 +37,7 @@
       },
       setTotalPrice: () => {
         document.querySelector('#SumShipping')!.textContent =
-          String(totalPrice) + '円';
+          totalPrice.toLocaleString() + '円';
       },
       setShipping: () => {
         const targetElement = document.querySelector(
@@ -57,7 +57,6 @@
       {
         name: name,
         url: 'https://page.auctions.yahoo.co.jp/',
-        // expirationDate: getUnixTime() + 604800,
       },
       (shipping: number | undefined | null) => {
         const sellerShipping = getSellerShipping();
@@ -102,27 +101,7 @@
     return auctionId;
   };
 
-  //現在時刻をUnixtimeで返す
-  const getUnixTime = () => {
-    const date = new Date();
-    const unixTime = Math.floor(date.getTime() / 1000);
-    return unixTime;
-  };
-
-  //Cookieに入力している送料を保存する
-  const setShippingToCookies = async (shipping: any) => {
-    const name = getAuctionId() + '_shipping';
-    chrome.runtime.sendMessage({
-      name: name,
-      url: 'https://page.auctions.yahoo.co.jp/',
-      value: shipping,
-      //  expirationDate: getUnixTime() + 604800,
-    });
-  };
-
   const main = async () => {
-    console.log('test');
-
     // 送料入力フォームを追加する
     await insertShippingForm();
     await tryGetShippingCookie();

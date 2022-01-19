@@ -1,15 +1,5 @@
-const getTabId = (url: string) =>
-  new Promise((resolve, reject) => {
-    chrome.tabs.query({ url: url }, (tab) => {
-      const tabId = tab[0].id;
-      resolve(tabId);
-    });
-  });
-
 const setCookies = (details: any) => {
-  chrome.cookies.set(details).then((res) => {
-    // console.log(res);
-  });
+  chrome.cookies.set(details);
 };
 //現在時刻をUnixtimeで返す
 const getUnixTime = () => {
@@ -29,18 +19,14 @@ chrome.runtime.onMessage.addListener(
     _,
     sendResponse
   ) => {
-    console.log(details);
-    if (details.value) {
+    // インプットフォームが空になっても動作させるため
+    if (Number(details.value) >= 0) {
       details.expirationDate = getUnixTime() + 604800;
       setCookies(details);
       return;
     }
-    chrome.cookies.get(details).then((cookies) => {
-      if (!cookies) {
-        details.expirationDate = getUnixTime() + 604800;
-        setCookies(details);
-      }
 
+    chrome.cookies.get(details).then((cookies) => {
       sendResponse(cookies?.value);
     });
 

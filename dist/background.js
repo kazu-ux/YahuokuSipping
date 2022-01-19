@@ -5,16 +5,8 @@ var __webpack_exports__ = {};
   !*** ./src/background.ts ***!
   \***************************/
 
-const getTabId = (url) => new Promise((resolve, reject) => {
-    chrome.tabs.query({ url: url }, (tab) => {
-        const tabId = tab[0].id;
-        resolve(tabId);
-    });
-});
 const setCookies = (details) => {
-    chrome.cookies.set(details).then((res) => {
-        // console.log(res);
-    });
+    chrome.cookies.set(details);
 };
 //現在時刻をUnixtimeで返す
 const getUnixTime = () => {
@@ -23,17 +15,13 @@ const getUnixTime = () => {
     return unixTime;
 };
 chrome.runtime.onMessage.addListener((details, _, sendResponse) => {
-    console.log(details);
-    if (details.value) {
+    // インプットフォームが空になっても動作させるため
+    if (Number(details.value) >= 0) {
         details.expirationDate = getUnixTime() + 604800;
         setCookies(details);
         return;
     }
     chrome.cookies.get(details).then((cookies) => {
-        if (!cookies) {
-            details.expirationDate = getUnixTime() + 604800;
-            setCookies(details);
-        }
         sendResponse(cookies?.value);
     });
     return true;
