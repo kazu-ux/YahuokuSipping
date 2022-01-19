@@ -48,7 +48,6 @@
   //Cookieに送料が保存されているかを確認する
   const tryGetShippingCookie = async () => {
     const name = getAuctionId() + '_shipping';
-    const auctioURL = getAuctionUrl();
 
     chrome.runtime.sendMessage(
       {
@@ -56,86 +55,39 @@
         url: 'https://page.auctions.yahoo.co.jp/',
       },
       (shipping: number | undefined | null) => {
-        const bar = Price(Number(shipping));
+        const sellerShipping = getSellerShipping();
+        console.log(sellerShipping);
+        if (!shipping && !sellerShipping) {
+          Price(Number(shipping)).setTotalPrice();
+          return;
+        }
+        if (!shipping && sellerShipping) {
+          const price = Price(Number(sellerShipping));
+          price.setShipping();
+          price.setTotalPrice();
+          return;
+        }
 
-        console.log(bar.sumPrice());
-        //
-        bar.setShipping();
-        bar.setTotalPrice();
+        const price = Price(Number(shipping));
+        price.setShipping();
+        price.setTotalPrice();
         console.log(shipping);
       }
     );
   };
 
-  //送料入力欄に数値を入れる
-  const setShippingToInputBox = (num: number) => {
-    const shippingForm = document.querySelector('dl > input[type=number]')!;
-    shippingForm.setAttribute('value', String(num));
-  };
-
   //出品者が設定している送料を取得する
-  const getShipping = async () => {
-    const shippingValue = await tryReturnShipping;
-    return shippingValue;
-  };
-
-  //出品者が設定している送料を取得する
-  const tryReturnShipping = new Promise((resolve, reject) => {
-    setTimeout(() => {
-      const shippingEle = document.querySelector('.Price__postageValue')!;
-      //送料無料の場合
-      if (shippingEle.textContent === '無料') {
-        resolve('0');
-      }
-      //全国一律の場合
-      else if (shippingEle.textContent!.match(/全国一律/)) {
-        resolve(
-          document
-            .querySelector('.Price__postageValue > .Price__postageValue')!
-            .textContent!.replace(/,/g, '')
-        );
-      }
-      //地域ごとの送料が設定されている場合
-      else if (shippingEle.textContent!.match(/[は円]/)) {
-        resolve(
-          document
-            .querySelector('.Price__postageValue > .Price__postageValue')!
-            .textContent!.replace(/,/g, '')
-        );
-      }
-      //送料未設定の場合
-      else {
-        resolve('');
-      }
-    }, 2000);
-  });
-
-  //入力されている送料を現在価格と足し合わせて、表示する
-  const sumShippingAndPrice = async (inputedShinnping: any) => {
-    //合計金額を表示する場所
-    const SumShippingArea = document.querySelector('#SumShipping')!;
-    //現在価格と送料を足す
-    const shippingPlusPrice = Number(inputedShinnping) + Number(returnPrice());
-    //金額にカンマを入れる
-    const priceInToComma = shippingPlusPrice.toLocaleString();
-    //送料込み価格を表示する
-    SumShippingArea.textContent = String(priceInToComma) + '円';
-  };
-
-  //現在価格、または税込み価格を返す関数
-  const returnPrice = () => {
-    const tax_price = document
-      .querySelector('.Price__tax')!
-      .textContent!.replace(/[^0-9]/g, '');
-    const str_price = (
-      document.querySelector('.Price__value')!.firstChild! as any
-    ).data; //○,○○○円
-    const num_price = str_price.replace(/[,円]/g, '');
-    if (tax_price === '0') {
-      return num_price;
-    } else {
-      return tax_price;
+  const getSellerShipping = () => {
+    const shipping = document.querySelector('.Price__postageValue')
+      ?.textContent!;
+    if (shipping.includes('無料')) {
+      return '0';
     }
+    if (shipping.includes('着払い')) {
+      return;
+    }
+    const shippingPrice = shipping.replace(/[^0-9]/g, '');
+    return shippingPrice;
   };
 
   //アクセスしているオークションIDを取得する
@@ -167,18 +119,6 @@
     });
   };
 
-  //Cookieに送料が保存されていれば、その送料を入力ボックスに挿入する。
-  //されていなければ、出品者が設定している送料を入力ボックスに挿入する。
-  chrome.runtime.onMessage.addListener(async (message) => {
-    if (message.isCookie) {
-      setShippingToInputBox(message.shipping);
-    } else {
-      setShippingToInputBox((await getShipping()) as any);
-    }
-
-    return true;
-  });
-
   const main = async () => {
     console.log('test');
 
@@ -193,6 +133,7 @@
         const inputvalue = inputELement.value;
 
         Price(Number(inputvalue)).setTotalPrice();
+        console.log('inputEvent');
       });
   };
 
