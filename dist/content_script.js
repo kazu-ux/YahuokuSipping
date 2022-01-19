@@ -36,8 +36,9 @@ var __webpack_exports__ = {};
                     String(totalPrice) + '円';
             },
             setShipping: () => {
-                document.querySelector('#shippingInput').value =
-                    String(shipping);
+                const targetElement = document.querySelector('#shippingInput');
+                targetElement.value = String(shipping);
+                // targetElement.dispatchEvent(new Event('input', { bubbles: true }));
             },
         };
     };
@@ -47,6 +48,7 @@ var __webpack_exports__ = {};
         chrome.runtime.sendMessage({
             name: name,
             url: 'https://page.auctions.yahoo.co.jp/',
+            // expirationDate: getUnixTime() + 604800,
         }, (shipping) => {
             const sellerShipping = getSellerShipping();
             console.log(sellerShipping);
@@ -84,10 +86,6 @@ var __webpack_exports__ = {};
         const auctionId = location.href.split('/')[5];
         return auctionId;
     };
-    const getAuctionUrl = () => {
-        const auctionUrl = location.href;
-        return auctionUrl;
-    };
     //現在時刻をUnixtimeで返す
     const getUnixTime = () => {
         const date = new Date();
@@ -101,7 +99,7 @@ var __webpack_exports__ = {};
             name: name,
             url: 'https://page.auctions.yahoo.co.jp/',
             value: shipping,
-            expirationDate: getUnixTime() + 604800,
+            //  expirationDate: getUnixTime() + 604800,
         });
     };
     const main = async () => {
@@ -114,6 +112,12 @@ var __webpack_exports__ = {};
             .addEventListener('input', (event) => {
             const inputELement = event.composedPath()[0];
             const inputvalue = inputELement.value;
+            const name = getAuctionId() + '_shipping';
+            chrome.runtime.sendMessage({
+                name: name,
+                url: 'https://page.auctions.yahoo.co.jp/',
+                value: inputvalue,
+            });
             Price(Number(inputvalue)).setTotalPrice();
             console.log('inputEvent');
         });

@@ -39,8 +39,11 @@
           String(totalPrice) + '円';
       },
       setShipping: () => {
-        (document.querySelector('#shippingInput') as HTMLInputElement).value =
-          String(shipping);
+        const targetElement = document.querySelector(
+          '#shippingInput'
+        ) as HTMLInputElement;
+        targetElement.value = String(shipping);
+        // targetElement.dispatchEvent(new Event('input', { bubbles: true }));
       },
     };
   };
@@ -53,6 +56,7 @@
       {
         name: name,
         url: 'https://page.auctions.yahoo.co.jp/',
+        // expirationDate: getUnixTime() + 604800,
       },
       (shipping: number | undefined | null) => {
         const sellerShipping = getSellerShipping();
@@ -65,6 +69,7 @@
           const price = Price(Number(sellerShipping));
           price.setShipping();
           price.setTotalPrice();
+
           return;
         }
 
@@ -96,11 +101,6 @@
     return auctionId;
   };
 
-  const getAuctionUrl = () => {
-    const auctionUrl = location.href;
-    return auctionUrl;
-  };
-
   //現在時刻をUnixtimeで返す
   const getUnixTime = () => {
     const date = new Date();
@@ -115,7 +115,7 @@
       name: name,
       url: 'https://page.auctions.yahoo.co.jp/',
       value: shipping,
-      expirationDate: getUnixTime() + 604800,
+      //  expirationDate: getUnixTime() + 604800,
     });
   };
 
@@ -132,6 +132,13 @@
         const inputELement = event.composedPath()[0] as HTMLInputElement;
         const inputvalue = inputELement.value;
 
+        const name = getAuctionId() + '_shipping';
+
+        chrome.runtime.sendMessage({
+          name: name,
+          url: 'https://page.auctions.yahoo.co.jp/',
+          value: inputvalue,
+        });
         Price(Number(inputvalue)).setTotalPrice();
         console.log('inputEvent');
       });
