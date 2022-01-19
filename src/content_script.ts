@@ -18,7 +18,7 @@
         targetElement.childNodes[0].textContent!.replace(/[^0-9]/g, '')
       );
     };
-    const getTax = () => {
+    const getTaxIncludedPrice = () => {
       const targetElement = document.querySelector('.Price__value')!;
       return Number(
         targetElement.childNodes[1].textContent!.replace(/[^0-9]/g, '')
@@ -26,8 +26,9 @@
     };
 
     const currentPrice = getCurrentPrice();
-    const tax = getTax();
-    const totalPrice = currentPrice + tax + shipping;
+    const taxIncludedPrice = getTaxIncludedPrice();
+    const price = Math.max(currentPrice, taxIncludedPrice);
+    const totalPrice = price + shipping;
 
     console.log(currentPrice, shipping, totalPrice);
     return {
