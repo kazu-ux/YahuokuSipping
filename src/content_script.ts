@@ -9,6 +9,16 @@
           '<dd class="Price__value ys" id="SumShipping">----円</dd>' +
           '<input type="number" id="shippingInput" value="">円'
       );
+    document
+      .querySelector('#shippingInput')
+      ?.addEventListener('keydown', (ev) => {
+        const NGKey = ['e', '.', '+', '-'];
+        const KeyboardEvent = ev as KeyboardEvent;
+        const inputKey = KeyboardEvent.key;
+        if (NGKey.includes(inputKey)) {
+          ev.preventDefault();
+        }
+      });
   };
 
   const Price = (shipping: number) => {

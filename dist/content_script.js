@@ -13,6 +13,16 @@ var __webpack_exports__ = {};
             .insertAdjacentHTML('afterend', '<dt class="Price__title ys">送料・税込み価格</dt>' +
             '<dd class="Price__value ys" id="SumShipping">----円</dd>' +
             '<input type="number" id="shippingInput" value="">円');
+        document
+            .querySelector('#shippingInput')
+            ?.addEventListener('keydown', (ev) => {
+            const NGKey = ['e', '.', '+', '-'];
+            const KeyboardEvent = ev;
+            const inputKey = KeyboardEvent.key;
+            if (NGKey.includes(inputKey)) {
+                ev.preventDefault();
+            }
+        });
     };
     const Price = (shipping) => {
         const getCurrentPrice = () => {
