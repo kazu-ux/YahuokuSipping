@@ -35,7 +35,7 @@ var __webpack_exports__ = {};
         };
         const currentPrice = getCurrentPrice();
         const taxIncludedPrice = getTaxIncludedPrice();
-        const price = Math.max(currentPrice, taxIncludedPrice);
+        const price = Math.max(currentPrice, taxIncludedPrice); // 税があるかどうかを判断する
         const totalPrice = price + shipping;
         console.log(currentPrice, shipping, totalPrice);
         return {
@@ -53,8 +53,7 @@ var __webpack_exports__ = {};
             },
         };
     };
-    //Cookieに送料が保存されているかを確認する
-    const tryGetShippingCookie = async () => {
+    const cookieManager = async () => {
         const name = getAuctionId() + '_shipping';
         chrome.runtime.sendMessage({
             name: name,
@@ -99,7 +98,7 @@ var __webpack_exports__ = {};
     const main = async () => {
         // 送料入力フォームを追加する
         await insertShippingForm();
-        await tryGetShippingCookie();
+        await cookieManager();
         document
             .querySelector('#shippingInput')
             .addEventListener('input', (event) => {
@@ -112,7 +111,6 @@ var __webpack_exports__ = {};
                 value: inputvalue,
             });
             Price(Number(inputvalue)).setTotalPrice();
-            console.log('inputEvent');
         });
     };
     //HTMLの読み込みが完了してから
