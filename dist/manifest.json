@@ -13,7 +13,7 @@
       "css": ["style.css"]
     }
   ],
-  "permissions": ["tabs", "cookies"],
+  "permissions": ["cookies"],
   "background": {
     "service_worker": "background.js"
   },
