@@ -1,4 +1,11 @@
-const setCookies = (details: any) => {
+type Details = {
+  name: string;
+  url: string;
+  value?: string | undefined;
+  expirationDate: number;
+};
+
+const setCookies = (details: Details) => {
   chrome.cookies.set(details);
 };
 //現在時刻をUnixtimeで返す
@@ -33,3 +40,5 @@ chrome.runtime.onMessage.addListener(
     return true;
   }
 );
+
+export {};
