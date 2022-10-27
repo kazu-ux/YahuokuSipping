@@ -1,0 +1,29 @@
+{
+  "name": "yahuokusipping",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "watch": "webpack -w"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kazu-ux/YahuokuSipping.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kazu-ux/YahuokuSipping/issues"
+  },
+  "homepage": "https://github.com/kazu-ux/YahuokuSipping#readme",
+  "dependencies": {
+    "@types/chrome": "^0.0.176"
+  },
+  "devDependencies": {
+    "ts-loader": "^9.2.6",
+    "webpack": "^5.66.0",
+    "webpack-cli": "^4.9.1"
+  }
+}

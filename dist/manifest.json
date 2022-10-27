@@ -1,0 +1,21 @@
+{
+  "name": "ヤフオク送料込み価格表示",
+  "version": "1.1.0",
+  "manifest_version": 3,
+  "description": "ヤフオクオークションページに送料込みの価格を表示します。",
+  "icons": {
+    "128": "icons/128.png"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://page.auctions.yahoo.co.jp/*"],
+      "js": ["content_script.js"],
+      "css": ["style.css"]
+    }
+  ],
+  "permissions": ["cookies"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "host_permissions": ["https://page.auctions.yahoo.co.jp/*"]
+}
