@@ -2,9 +2,6 @@ import './css/style.css';
 
 //送料込み価格と送料入力フォームの項目を追加する
 const insertShippingForm = async () => {
-  const title = document.createElement('dt');
-  title.className = 'Price__title ys';
-
   document
     .querySelector('.Price__value')
     ?.insertAdjacentHTML(
@@ -15,13 +12,11 @@ const insertShippingForm = async () => {
     );
   document
     .querySelector('#shippingInput')
-    ?.addEventListener('keydown', (ev) => {
+    ?.addEventListener('keydown', (event) => {
       const NGKey = ['e', '.', '+', '-'];
-      const KeyboardEvent = ev as KeyboardEvent;
+      const KeyboardEvent = event as KeyboardEvent;
       const inputKey = KeyboardEvent.key;
-      if (NGKey.includes(inputKey)) {
-        ev.preventDefault();
-      }
+      if (NGKey.includes(inputKey)) event.preventDefault();
     });
 };
 
@@ -61,7 +56,6 @@ const Price = (shipping: number) => {
       const targetElement =
         document.querySelector<HTMLInputElement>('#shippingInput');
       if (targetElement) targetElement.value = String(shipping);
-      // targetElement.dispatchEvent(new Event('input', { bubbles: true }));
     },
   };
 };
@@ -123,7 +117,7 @@ const main = async () => {
   await cookieManager();
 
   document
-    .querySelector('#shippingInput')
+    .querySelector<HTMLInputElement>('#shippingInput')
     ?.addEventListener('input', (event) => {
       const inputELement = event.composedPath()[0] as HTMLInputElement;
       const inputvalue = inputELement.value;
@@ -139,7 +133,5 @@ const main = async () => {
     });
 };
 
-//HTMLの読み込みが完了してから
-window.addEventListener('load', main);
-
+main();
 export {};
