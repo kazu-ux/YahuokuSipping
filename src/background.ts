@@ -1,7 +1,7 @@
 type Details = {
   name: string;
   url: string;
-  value?: string | undefined;
+  value?: string;
   expirationDate: number;
 };
 
