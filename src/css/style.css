@@ -1,9 +1,36 @@
-.Price__title.ys {
-  margin-top: 1rem;
-}
-
 input[type='number']::-webkit-outer-spin-button,
 input[type='number']::-webkit-inner-spin-button {
   -webkit-appearance: none;
   margin: 0;
+}
+
+.Price__title.ys {
+  margin-top: 1rem;
+}
+
+.budget-container {
+  margin-bottom: 0.5rem;
+}
+
+.budget-label {
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  gap: 0.5rem;
+}
+
+input[type='number'] {
+  text-align: right;
+}
+
+.shipping-input {
+  width: 5rem;
+  margin-right: 0.5rem;
+}
+
+.shipping-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
 }

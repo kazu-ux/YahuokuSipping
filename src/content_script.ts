@@ -1,4 +1,34 @@
+import { NumberInputForm } from './content_scripts/ui/number_input_form';
 import './css/style.css';
+import { isNumber } from './functional/is_number';
+
+const createShippingContainer = () => {
+  const div = document.createElement('div');
+  div.className = 'shipping-container';
+
+  const dt = document.createElement('dt');
+  dt.className = 'Price__title ys';
+  dt.textContent = '送料・税込み価格';
+
+  const dd = document.createElement('dd');
+  dd.className = 'Price__value ys';
+  dd.id = 'SumShipping';
+  dd.textContent = '----円';
+
+  const input = NumberInputForm('shipping-input');
+  const span = document.createElement('span');
+  span.textContent = '円';
+  const shippingForm = document.createElement('div');
+  shippingForm.className = 'shipping-form';
+  shippingForm.appendChild(input);
+  shippingForm.appendChild(span);
+
+  div.appendChild(dt);
+  div.appendChild(dd);
+  div.appendChild(shippingForm);
+
+  return div;
+};
 
 //送料込み価格と送料入力フォームの項目を追加する
 const insertShippingForm = async () => {
@@ -6,22 +36,13 @@ const insertShippingForm = async () => {
   title.className = 'Price__title ys';
 
   document
-    .querySelector('.Price__value')
-    ?.insertAdjacentHTML(
-      'afterend',
-      '<div><dt class="Price__title ys">送料・税込み価格</dt>' +
-        '<dd class="Price__value ys" id="SumShipping">----円</dd>' +
-        '<input type="number" id="shippingInput" value="">円</div>'
-    );
+    .querySelector('.Price__row')
+    ?.insertAdjacentElement('afterend', createShippingContainer());
   document
-    .querySelector('#shippingInput')
-    ?.addEventListener('keydown', (ev) => {
-      const NGKey = ['e', '.', '+', '-'];
-      const KeyboardEvent = ev as KeyboardEvent;
-      const inputKey = KeyboardEvent.key;
-      if (NGKey.includes(inputKey)) {
-        ev.preventDefault();
-      }
+    .querySelector('.shipping-input')
+    ?.addEventListener('keydown', (event) => {
+      const KeyboardEvent = event as KeyboardEvent;
+      if (!isNumber(KeyboardEvent.key)) event.preventDefault();
     });
 };
 
@@ -59,7 +80,7 @@ const Price = (shipping: number) => {
     },
     setShipping: () => {
       const targetElement =
-        document.querySelector<HTMLInputElement>('#shippingInput');
+        document.querySelector<HTMLInputElement>('.shipping-input');
       if (targetElement) targetElement.value = String(shipping);
       // targetElement.dispatchEvent(new Event('input', { bubbles: true }));
     },
@@ -123,7 +144,7 @@ const main = async () => {
   await cookieManager();
 
   document
-    .querySelector('#shippingInput')
+    .querySelector<HTMLInputElement>('.shipping-input')
     ?.addEventListener('input', (event) => {
       const inputELement = event.composedPath()[0] as HTMLInputElement;
       const inputvalue = inputELement.value;
