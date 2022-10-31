@@ -25,6 +25,11 @@ const createShippingContainer = () => {
     Price(Number(inputValue)).setTotalPrice();
   };
 
+  const onKeydown = (event: KeyboardEvent) => {
+    const KeyboardEvent = event as KeyboardEvent;
+    if (!isNumber(KeyboardEvent.key)) event.preventDefault();
+  };
+
   const div = document.createElement('div');
   div.className = 'shipping-container';
 
@@ -38,6 +43,7 @@ const createShippingContainer = () => {
   dd.textContent = '----円';
 
   const input = NumberInputForm('shipping-input');
+  input.addEventListener('keydown', onKeydown);
   input.addEventListener('input', onInput);
 
   const span = document.createElement('span');
@@ -56,18 +62,9 @@ const createShippingContainer = () => {
 
 //送料込み価格と送料入力フォームの項目を追加する
 const insertShippingForm = async () => {
-  const title = document.createElement('dt');
-  title.className = 'Price__title ys';
-
   document
     .querySelector('.Price__row')
     ?.insertAdjacentElement('afterend', createShippingContainer());
-  document
-    .querySelector('.shipping-input')
-    ?.addEventListener('keydown', (event) => {
-      const KeyboardEvent = event as KeyboardEvent;
-      if (!isNumber(KeyboardEvent.key)) event.preventDefault();
-    });
 };
 
 const Price = (shipping: number) => {
