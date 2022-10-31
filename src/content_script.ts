@@ -1,8 +1,30 @@
+import { CookieManager } from './content_scripts/cookie/CookieManager';
 import { NumberInputForm } from './content_scripts/ui/number_input_form';
 import './css/style.css';
 import { isNumber } from './functional/is_number';
 
+console.log('content');
+
+//アクセスしているオークションIDを取得する
+const getAuctionId = () => {
+  const auctionId = location.href.split('/')[5];
+  return auctionId;
+};
+
+const cookieManager = CookieManager(getAuctionId());
+
 const createShippingContainer = () => {
+  const onInput = async (event: Event) => {
+    const inputELement = event.composedPath()[0] as HTMLInputElement;
+    const inputValue = inputELement.value;
+    console.log(inputValue);
+
+    if (!inputValue) cookieManager.setCookie('');
+    cookieManager.setCookie(inputValue);
+
+    Price(Number(inputValue)).setTotalPrice();
+  };
+
   const div = document.createElement('div');
   div.className = 'shipping-container';
 
@@ -16,6 +38,8 @@ const createShippingContainer = () => {
   dd.textContent = '----円';
 
   const input = NumberInputForm('shipping-input');
+  input.addEventListener('input', onInput);
+
   const span = document.createElement('span');
   span.textContent = '円';
   const shippingForm = document.createElement('div');
@@ -82,82 +106,38 @@ const Price = (shipping: number) => {
       const targetElement =
         document.querySelector<HTMLInputElement>('.shipping-input');
       if (targetElement) targetElement.value = String(shipping);
-      // targetElement.dispatchEvent(new Event('input', { bubbles: true }));
     },
   };
-};
-
-const cookieManager = async () => {
-  const name = getAuctionId() + '_shipping';
-
-  chrome.runtime.sendMessage(
-    {
-      name: name,
-      url: 'https://page.auctions.yahoo.co.jp/',
-    },
-    (shipping: number | undefined | null) => {
-      const sellerShipping = getSellerShipping();
-      console.log(sellerShipping);
-      if (!shipping && !sellerShipping) {
-        Price(Number(shipping)).setTotalPrice();
-        return;
-      }
-      if (!shipping && sellerShipping) {
-        const price = Price(Number(sellerShipping));
-        price.setShipping();
-        price.setTotalPrice();
-
-        return;
-      }
-
-      const price = Price(Number(shipping));
-      price.setShipping();
-      price.setTotalPrice();
-      console.log(shipping);
-    }
-  );
 };
 
 //出品者が設定している送料を取得する
 const getSellerShipping = () => {
   const shipping = document.querySelector('.Price__postageValue')?.textContent;
-  if (!shipping) return;
+  if (!shipping) return '';
   if (shipping.includes('無料')) {
     return '0';
   }
   if (shipping.includes('着払い')) {
-    return;
+    return '';
   }
   const shippingPrice = shipping.replace(/[^0-9]/g, '');
   return shippingPrice;
 };
 
-//アクセスしているオークションIDを取得する
-const getAuctionId = () => {
-  const auctionId = location.href.split('/')[5];
-  return auctionId;
+const setInputShipping = (shipping: string) => {
+  const inputElement =
+    document.querySelector<HTMLInputElement>('.shipping-input');
+  if (!inputElement) return;
+  inputElement.value = shipping;
+  inputElement.dispatchEvent(new Event('input', { bubbles: true }));
 };
 
 const main = async () => {
   // 送料入力フォームを追加する
   await insertShippingForm();
-  await cookieManager();
-
-  document
-    .querySelector<HTMLInputElement>('.shipping-input')
-    ?.addEventListener('input', (event) => {
-      const inputELement = event.composedPath()[0] as HTMLInputElement;
-      const inputvalue = inputELement.value;
-
-      const name = getAuctionId() + '_shipping';
-
-      chrome.runtime.sendMessage({
-        name: name,
-        url: 'https://page.auctions.yahoo.co.jp/',
-        value: inputvalue,
-      });
-      Price(Number(inputvalue)).setTotalPrice();
-    });
+  const cookie = await cookieManager.getCookie();
+  if (!cookie) return setInputShipping(getSellerShipping());
+  setInputShipping(cookie.value);
 };
 
 //HTMLの読み込みが完了してから

@@ -2,7 +2,7 @@ type Details = {
   name: string;
   url: string;
   value?: string;
-  expirationDate: number;
+  expirationDate?: number;
 };
 
 const setCookies = (details: Details) => {
@@ -21,21 +21,24 @@ chrome.runtime.onMessage.addListener(
       name: string;
       url: string;
       value?: string;
-      expirationDate: number;
+      expirationDate?: number;
     },
     _,
     sendResponse
   ) => {
-    // インプットフォームが空になっても動作させるため
-    if (Number(details.value) >= 0) {
-      details.expirationDate = getUnixTime() + 604800;
-      setCookies(details);
+    details.expirationDate = getUnixTime() + 604800;
+    if (details.value || details.value === '') {
+      chrome.cookies.set(details);
       return;
     }
-
-    chrome.cookies.get(details).then((cookies) => {
-      sendResponse(cookies?.value);
-    });
+    chrome.cookies
+      .get({
+        name: details.name,
+        url: details.url,
+      })
+      .then((cookie) => {
+        sendResponse(cookie);
+      });
 
     return true;
   }
