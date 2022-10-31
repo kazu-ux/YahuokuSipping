@@ -3,8 +3,6 @@ import { NumberInputForm } from './content_scripts/ui/number_input_form';
 import './css/style.css';
 import { isNumber } from './functional/is_number';
 
-console.log('content');
-
 //アクセスしているオークションIDを取得する
 const getAuctionId = () => {
   const auctionId = location.href.split('/')[5];
