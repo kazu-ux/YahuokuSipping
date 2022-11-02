@@ -1,4 +1,6 @@
 import { getAuctionId } from '../functional/get_auction_id';
+
+import { getTaxRate } from '../functional/get_tax_rate';
 import { isNumber } from '../functional/is_number';
 import { CookieManager } from './cookie/CookieManager';
 import { NumberInputForm } from './ui/number_input_form';
@@ -6,41 +8,42 @@ import { NumberInputForm } from './ui/number_input_form';
 const cookieManager = CookieManager(getAuctionId());
 const shipping = (await cookieManager.getCookie())?.value;
 
-const getCurrentPrice = () => {
-  const targetElement = document.querySelector('.Price__value');
-  if (!targetElement) return;
-  return Number(
-    targetElement.childNodes[0].textContent?.replace(/[^0-9]/g, '')
-  );
-};
-
-const getTax = () => {
-  const targetElement = document.querySelector<HTMLSpanElement>(
-    '.js-validator-taxPrice'
-  );
-  if (!targetElement) return;
-  return Number(targetElement.innerText);
-};
-
 const calculateDifference = (budget: string) => {
-  const currentPrice = getCurrentPrice();
-
+  const taxRate = getTaxRate();
   const taxExcludedPrice = Math.round(
-    (Number(budget) - (currentPrice ?? 0) - Number(shipping)) / 1.1
+    (Number(budget) - Number(shipping)) / (1 + taxRate / 100)
   );
-
-  console.log(budget, currentPrice, Number(shipping), taxExcludedPrice);
 
   return taxExcludedPrice;
 };
 
-const setInputValue = async (value: number) => {
+const getBidPriceInput = () => {
   const inputElement = document.querySelector<HTMLInputElement>(
     '.BidModal__inputPrice'
   );
-  if (!inputElement) return;
-  inputElement.value = String(value);
-  inputElement.focus();
+  return inputElement;
+};
+
+const toggleLimitPriceMessage = (taxExcludedPrice: number) => {
+  const limitPriceElement = document.querySelector<HTMLParagraphElement>(
+    '.js-validator-error-priceLimit'
+  );
+  if (!limitPriceElement) return;
+  const limitPrice = limitPriceElement.innerText.replace(/[^0-9]/g, '');
+  console.log(limitPrice);
+
+  if (taxExcludedPrice < Number(limitPrice)) {
+    limitPriceElement.style.display = 'block';
+  } else {
+    limitPriceElement.style.display = '';
+  }
+};
+
+const setInputValue = async (bidPrice: number) => {
+  const bidPriceInput = getBidPriceInput();
+  if (!bidPriceInput) return;
+  bidPriceInput.value = String(bidPrice);
+  bidPriceInput.dispatchEvent(new KeyboardEvent('keyup', { key: 'a' }));
 
   return;
 };
@@ -52,15 +55,29 @@ const Budget = () => {
     return span;
   };
 
-  const onInput = async (event: Event) => {
-    const inputElement = event.composedPath()[0] as HTMLInputElement;
-    const inputValue = inputElement.value;
-    const taxExcludedPrice = calculateDifference(inputValue);
-    if (taxExcludedPrice < 1) return;
-    await setInputValue(taxExcludedPrice);
-    await new Promise((resolve) => setTimeout(resolve, 100));
+  let timer: number;
 
-    inputElement.focus();
+  const onInput = async (event: Event) => {
+    window.clearTimeout(timer);
+
+    const budgetInput = event.composedPath()[0] as HTMLInputElement;
+
+    timer = window.setTimeout(async () => {
+      const budgetPrice = budgetInput.value;
+      const taxExcludedPrice = calculateDifference(budgetPrice);
+      const taxRate = getTaxRate();
+      const tax = Math.round(taxExcludedPrice * (taxRate / 100));
+      console.log({ budgetPrice, taxExcludedPrice });
+
+      toggleLimitPriceMessage(taxExcludedPrice);
+      await setInputValue(taxExcludedPrice);
+
+      const totalPriceElement = document.querySelector('.total-price');
+      if (!totalPriceElement) return;
+
+      totalPriceElement.textContent =
+        ': ' + (taxExcludedPrice + tax + Number(shipping)) + ' 円';
+    }, 500);
 
     /*     if (!inputValue) cookieManager.setCookie('');
       cookieManager.setCookie(inputValue); */
@@ -91,13 +108,6 @@ const Budget = () => {
 
 document.querySelector('.BidModal__inputArea')?.prepend(Budget());
 
-document
-  .querySelector('.budget-input')
-  ?.addEventListener('keydown', (event) => {
-    const keyEvent = event as KeyboardEvent;
-    if (!isNumber(keyEvent.key)) event.preventDefault();
-  });
-
 const shippingElement = () => {
   const dl = document.createElement('dl');
   dl.className = 'BidModal__subTotal';
@@ -115,7 +125,26 @@ const shippingElement = () => {
 
   return dl;
 };
-
 document.querySelector('.BidModal__subTotal')?.prepend(shippingElement());
+
+const totalPriceElement = (price?: number) => {
+  const dl = document.createElement('dl');
+  dl.className = 'total-price-container';
+
+  const dtTitle = document.createElement('dt');
+  dtTitle.className = 'BidModal__left';
+  dtTitle.textContent = '送料込み価格';
+
+  const ddTotalPrice = document.createElement('dd');
+  ddTotalPrice.className = 'BidModal__right total-price';
+  ddTotalPrice.textContent = ': ' + (price ?? '----') + ' 円';
+
+  dl.append(dtTitle);
+  dl.append(ddTotalPrice);
+
+  return dl;
+};
+
+document.querySelector('.BidModal__totalArea')?.append(totalPriceElement());
 
 export {};
