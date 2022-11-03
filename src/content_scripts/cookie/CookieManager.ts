@@ -1,5 +1,8 @@
-export const CookieManager = (auctionId: string) => {
-  const cookieName = auctionId + '_shipping';
+export const CookieManager = (
+  auctionId: string,
+  priceType: 'shipping' | 'budget'
+) => {
+  const cookieName = auctionId + '_' + priceType;
   const URL = 'https://page.auctions.yahoo.co.jp/';
   console.log(cookieName, URL);
 
@@ -12,11 +15,11 @@ export const CookieManager = (auctionId: string) => {
         });
       return cookie;
     },
-    setCookie: (shipping: string) => {
+    setCookie: (price: string) => {
       chrome.runtime.sendMessage({
         name: cookieName,
         url: URL,
-        value: shipping,
+        value: price,
       });
     },
   };
