@@ -8,14 +8,14 @@ export const AuctionPage = async () => {
 
   const createShippingContainer = () => {
     const onInput = async (event: Event) => {
-      const inputELement = event.composedPath()[0] as HTMLInputElement;
-      const inputValue = inputELement.value;
-      console.log(inputValue);
+      const inputElement = event.composedPath()[0] as HTMLInputElement;
+      const inputShipping = inputElement.value;
+      console.log(inputShipping);
 
-      if (!inputValue) cookieManager.setCookie('');
-      cookieManager.setCookie(inputValue);
+      if (!inputShipping) cookieManager.setCookie('');
+      cookieManager.setCookie(inputShipping);
 
-      Price(Number(inputValue)).setTotalPrice();
+      Price(Number(inputShipping)).setTotalPrice();
     };
 
     const onKeydown = (event: KeyboardEvent) => {
