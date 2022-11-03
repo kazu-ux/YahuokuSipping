@@ -24,12 +24,17 @@ export const bidWindow = async () => {
     return taxExcludedPrice;
   };
 
-  const calculateBidPrice = () => {
-    const budget =
+  const getBudgetPrice = () => {
+    const budgetPrice =
       document.querySelector<HTMLInputElement>('.budget-input')?.value;
-    if (!budget) return 0;
+    if (!budgetPrice) return '0';
+    return budgetPrice;
+  };
 
-    const taxExcludedPrice = getTaxExcludedPrice(budget);
+  const calculateBidPrice = () => {
+    const budgetPrice = getBudgetPrice();
+
+    const taxExcludedPrice = getTaxExcludedPrice(budgetPrice);
     return taxExcludedPrice;
   };
 
@@ -87,7 +92,7 @@ export const bidWindow = async () => {
         await setInputValue(bidPrice);
         updateTotalPrice();
 
-        cookieManager.setCookie(String(bidPrice));
+        cookieManager.setCookie(getBudgetPrice());
       }, 500);
     };
 
