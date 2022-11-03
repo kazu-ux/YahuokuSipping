@@ -1,9 +1,13 @@
+import { getAuctionId } from '../functional/get_auction_id';
 import { getTaxRate } from '../functional/get_tax_rate';
 import { isNumber } from '../functional/is_number';
+import { CookieManager } from './cookie/CookieManager';
 
 import { NumberInputForm } from './ui/number_input_form';
 
 export const bidWindow = async () => {
+  const cookieManager = CookieManager(getAuctionId(), 'budget');
+
   const getShipping = () =>
     document.querySelector<HTMLInputElement>('.shipping-input')?.value;
 
@@ -54,6 +58,20 @@ export const bidWindow = async () => {
     span.textContent = str;
     return span;
   };
+
+  const updateTotalPrice = () => {
+    const bidPrice = calculateBidPrice();
+    const taxRate = getTaxRate();
+    const tax = Math.round(bidPrice * (taxRate / 100));
+
+    const totalPriceElement = document.querySelector('.total-price');
+    if (!totalPriceElement) return;
+
+    totalPriceElement.textContent = String(
+      bidPrice + tax + Number(getShipping())
+    );
+  };
+
   const createBudgetContainer = () => {
     let timer: number;
 
@@ -62,22 +80,13 @@ export const bidWindow = async () => {
 
       timer = window.setTimeout(async () => {
         const bidPrice = calculateBidPrice();
-        const taxRate = getTaxRate();
-
-        const tax = Math.round(bidPrice * (taxRate / 100));
 
         toggleLimitPriceMessage(bidPrice);
         await setInputValue(bidPrice);
+        updateTotalPrice();
 
-        const totalPriceElement = document.querySelector('.total-price');
-        if (!totalPriceElement) return;
-
-        totalPriceElement.textContent =
-          ': ' + (bidPrice + tax + Number(getShipping())) + ' 円';
+        cookieManager.setCookie(String(bidPrice));
       }, 500);
-
-      /*     if (!inputValue) cookieManager.setCookie('');
-      cookieManager.setCookie(inputValue); */
     };
 
     const onKeydown = (event: KeyboardEvent) => {
@@ -137,7 +146,7 @@ export const bidWindow = async () => {
 
     const ddTotalPrice = document.createElement('dd');
     ddTotalPrice.className = 'BidModal__right total-price';
-    ddTotalPrice.textContent = ': ' + '----' + ' 円';
+    ddTotalPrice.textContent = '----';
 
     dl.append(dtTitle);
     dl.append(ddTotalPrice);
@@ -155,14 +164,21 @@ export const bidWindow = async () => {
     threshold: 0,
   };
 
-  const callback = (entries: IntersectionObserverEntry[]) => {
+  const callback = async (entries: IntersectionObserverEntry[]) => {
     if (!entries[0].isIntersecting) return;
+    const budgetInputElement =
+      document.querySelector<HTMLInputElement>('.budget-input');
+    if (!budgetInputElement) return;
+
+    const cookieBudget = (await cookieManager.getCookie())?.value;
+    budgetInputElement.value = cookieBudget ?? '';
+
     const shippingElement = document.querySelector<HTMLElement>('.shipping');
     if (!shippingElement) return;
     shippingElement.textContent = getShipping() ?? '';
     const bidPrice = calculateBidPrice();
     setInputValue(bidPrice);
-    console.log('test');
+    updateTotalPrice();
   };
 
   const budgetContainer = document.querySelector('.budget-container');
