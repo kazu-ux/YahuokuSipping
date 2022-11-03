@@ -7,6 +7,10 @@ import { NumberInputForm } from './ui/number_input_form';
 
 export const bidWindow = async () => {
   const cookieManager = CookieManager(getAuctionId(), 'budget');
+  const bidPriceInput = document.querySelector<HTMLInputElement>(
+    '.BidModal__inputPrice'
+  );
+  if (!bidPriceInput) return;
 
   const getShipping = () =>
     document.querySelector<HTMLInputElement>('.shipping-input')?.value;
@@ -24,7 +28,7 @@ export const bidWindow = async () => {
     const budget =
       document.querySelector<HTMLInputElement>('.budget-input')?.value;
     if (!budget) return 0;
-    const shipping = Number(getShipping());
+
     const taxExcludedPrice = getTaxExcludedPrice(budget);
     return taxExcludedPrice;
   };
@@ -45,10 +49,6 @@ export const bidWindow = async () => {
   };
 
   const setInputValue = async (bidPrice: number) => {
-    const bidPriceInput = document.querySelector<HTMLInputElement>(
-      '.BidModal__inputPrice'
-    );
-    if (!bidPriceInput) return;
     bidPriceInput.value = String(bidPrice);
     bidPriceInput.dispatchEvent(new KeyboardEvent('keyup', { key: 'a' }));
     return;
@@ -66,6 +66,8 @@ export const bidWindow = async () => {
 
     const totalPriceElement = document.querySelector('.total-price');
     if (!totalPriceElement) return;
+
+    console.log({ bidPrice, taxRate, tax });
 
     totalPriceElement.textContent = String(
       bidPrice + tax + Number(getShipping())
@@ -179,6 +181,12 @@ export const bidWindow = async () => {
     const bidPrice = calculateBidPrice();
     setInputValue(bidPrice);
     updateTotalPrice();
+
+    bidPriceInput.addEventListener('input', () => {
+      const totalPriceElement = document.querySelector('.total-price');
+      if (!totalPriceElement) return;
+      totalPriceElement.textContent = '';
+    });
   };
 
   const budgetContainer = document.querySelector('.budget-container');
