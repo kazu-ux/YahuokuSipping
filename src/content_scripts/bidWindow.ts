@@ -1,28 +1,28 @@
-import { getAuctionId } from '../functional/get_auction_id';
-
 import { getTaxRate } from '../functional/get_tax_rate';
 import { isNumber } from '../functional/is_number';
-import { CookieManager } from './cookie/CookieManager';
+
 import { NumberInputForm } from './ui/number_input_form';
 
 export const bidWindow = async () => {
-  const cookieManager = CookieManager(getAuctionId());
-  const shipping = (await cookieManager.getCookie())?.value;
+  const getShipping = () =>
+    document.querySelector<HTMLInputElement>('.shipping-input')?.value;
 
   const getTaxExcludedPrice = (budget: string) => {
     const taxRate = getTaxRate();
     const taxExcludedPrice = Math.round(
-      (Number(budget) - Number(shipping)) / (1 + taxRate / 100)
+      (Number(budget) - Number(getShipping())) / (1 + taxRate / 100)
     );
 
     return taxExcludedPrice;
   };
 
-  const getBidPriceInput = () => {
-    const inputElement = document.querySelector<HTMLInputElement>(
-      '.BidModal__inputPrice'
-    );
-    return inputElement;
+  const calculateBidPrice = () => {
+    const budget =
+      document.querySelector<HTMLInputElement>('.budget-input')?.value;
+    if (!budget) return 0;
+    const shipping = Number(getShipping());
+    const taxExcludedPrice = getTaxExcludedPrice(budget);
+    return taxExcludedPrice;
   };
 
   const toggleLimitPriceMessage = (taxExcludedPrice: number) => {
@@ -31,7 +31,7 @@ export const bidWindow = async () => {
     );
     if (!limitPriceElement) return;
     const limitPrice = limitPriceElement.innerText.replace(/[^0-9]/g, '');
-    console.log(limitPrice);
+    console.log({ limitPrice });
 
     if (taxExcludedPrice < Number(limitPrice)) {
       limitPriceElement.style.display = 'block';
@@ -41,42 +41,39 @@ export const bidWindow = async () => {
   };
 
   const setInputValue = async (bidPrice: number) => {
-    const bidPriceInput = getBidPriceInput();
+    const bidPriceInput = document.querySelector<HTMLInputElement>(
+      '.BidModal__inputPrice'
+    );
     if (!bidPriceInput) return;
     bidPriceInput.value = String(bidPrice);
     bidPriceInput.dispatchEvent(new KeyboardEvent('keyup', { key: 'a' }));
     return;
   };
-
+  const createTextElement = (str: string) => {
+    const span = document.createElement('span');
+    span.textContent = str;
+    return span;
+  };
   const createBudgetContainer = () => {
-    const createTextElement = (str: string) => {
-      const span = document.createElement('span');
-      span.textContent = str;
-      return span;
-    };
-
     let timer: number;
 
-    const onInput = async (event: Event) => {
+    const onInput = async () => {
       window.clearTimeout(timer);
 
-      const budgetInput = event.composedPath()[0] as HTMLInputElement;
-
       timer = window.setTimeout(async () => {
-        const budgetPrice = budgetInput.value;
-        const taxExcludedPrice = getTaxExcludedPrice(budgetPrice);
+        const bidPrice = calculateBidPrice();
         const taxRate = getTaxRate();
-        const tax = Math.round(taxExcludedPrice * (taxRate / 100));
-        console.log({ budgetPrice, taxExcludedPrice });
 
-        toggleLimitPriceMessage(taxExcludedPrice);
-        await setInputValue(taxExcludedPrice);
+        const tax = Math.round(bidPrice * (taxRate / 100));
+
+        toggleLimitPriceMessage(bidPrice);
+        await setInputValue(bidPrice);
 
         const totalPriceElement = document.querySelector('.total-price');
         if (!totalPriceElement) return;
 
         totalPriceElement.textContent =
-          ': ' + (taxExcludedPrice + tax + Number(shipping)) + ' 円';
+          ': ' + (bidPrice + tax + Number(getShipping())) + ' 円';
       }, 500);
 
       /*     if (!inputValue) cookieManager.setCookie('');
@@ -119,8 +116,7 @@ export const bidWindow = async () => {
     dtTitle.textContent = '送料';
 
     const ddShipping = document.createElement('dd');
-    ddShipping.className = 'BidModal__right';
-    ddShipping.textContent = ': ' + shipping + ' 円';
+    ddShipping.className = 'BidModal__right shipping';
 
     dl.append(dtTitle);
     dl.append(ddShipping);
@@ -152,4 +148,23 @@ export const bidWindow = async () => {
   document
     .querySelector('.BidModal__totalArea')
     ?.append(createTotalPriceElement());
+
+  const options = {
+    root: null,
+    rootMargin: '10px',
+    threshold: 0,
+  };
+
+  const callback = (entries: IntersectionObserverEntry[]) => {
+    if (!entries[0].isIntersecting) return;
+    const shippingElement = document.querySelector<HTMLElement>('.shipping');
+    if (!shippingElement) return;
+    shippingElement.textContent = getShipping() ?? '';
+    const bidPrice = calculateBidPrice();
+    setInputValue(bidPrice);
+    console.log('test');
+  };
+
+  const observer = new IntersectionObserver(callback, options);
+  observer.observe(document.querySelector('.budget-container')!);
 };
