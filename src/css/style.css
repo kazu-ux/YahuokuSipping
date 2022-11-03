@@ -35,10 +35,12 @@ input[type='number'] {
   margin-bottom: 1rem;
 }
 
-.shipping:before {
+.shipping:before,
+.total-price::before {
   content: ': ';
 }
 
-.shipping:after {
+.shipping:after,
+.total-price::after {
   content: ' 円';
 }
