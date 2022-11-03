@@ -165,6 +165,9 @@ export const bidWindow = async () => {
     console.log('test');
   };
 
+  const budgetContainer = document.querySelector('.budget-container');
+  if (!budgetContainer) return;
+
   const observer = new IntersectionObserver(callback, options);
-  observer.observe(document.querySelector('.budget-container')!);
+  observer.observe(budgetContainer);
 };
