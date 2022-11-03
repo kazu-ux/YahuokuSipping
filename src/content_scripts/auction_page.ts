@@ -4,7 +4,7 @@ import { getAuctionId } from '../functional/get_auction_id';
 import { isNumber } from '../functional/is_number';
 
 export const AuctionPage = async () => {
-  const cookieManager = CookieManager(getAuctionId());
+  const cookieManager = CookieManager(getAuctionId(), 'shipping');
 
   const createShippingContainer = () => {
     const onInput = async (event: Event) => {
