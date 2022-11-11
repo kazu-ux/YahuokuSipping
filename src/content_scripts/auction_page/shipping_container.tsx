@@ -27,12 +27,16 @@ const ShippingContainer = () => {
       .querySelector('.Price__row .Price__value')
       ?.childNodes[0].textContent?.replace(/[^0-9]/g, '');
 
-    const taxIncludedPrice = document
-      .querySelector('.Price__row .Price__value')
-      ?.childNodes[1].textContent?.replace(/[^0-9]/g, '');
+    const getTaxIncludedPrice = () => {
+      const taxIncludedPriceElement = document.querySelector(
+        '.Price__row .Price__value'
+      )?.childNodes[1];
+      if (!taxIncludedPriceElement) return 0;
+      return taxIncludedPriceElement.textContent?.replace(/[^0-9]/g, '');
+    };
 
     const totalPrice =
-      Math.max(Number(currentPrice), Number(taxIncludedPrice)) +
+      Math.max(Number(currentPrice), Number(getTaxIncludedPrice())) +
       Number(shipping);
     return totalPrice;
   };
