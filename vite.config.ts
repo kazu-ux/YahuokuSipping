@@ -15,7 +15,10 @@ const manifest = defineManifest({
   content_scripts: [
     {
       matches: ['https://page.auctions.yahoo.co.jp/*'],
-      js: ['src/content_script.ts'],
+      js: [
+        'src/content_scripts/auction_page/index.tsx',
+        'src/content_scripts/bid_window/index.tsx',
+      ],
     },
   ],
   permissions: ['cookies'],
