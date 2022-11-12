@@ -35,8 +35,6 @@ const BudgetContainer = () => {
       (Number(budget) - Number(shipping)) / (1 + taxRate / 100)
     );
 
-    // console.log({ budget, taxRate, shipping, taxExcludedPrice });
-
     return taxExcludedPrice;
   };
   const calculateTotalPrice = (bidPrice: number, shipping: number) => {
