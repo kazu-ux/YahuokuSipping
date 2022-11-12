@@ -11,7 +11,7 @@ const TotalPriceRow = (props: Props) => {
 
   return (
     <dl className="BidModal__total totalPriceRow">
-      <dt className="BidModal__left">送料込み金額</dt>
+      <dt className="BidModal__left">送料・税込み金額</dt>
       <dd className="BidModal__right">
         : {props.totalPrice.toLocaleString()} 円
       </dd>
